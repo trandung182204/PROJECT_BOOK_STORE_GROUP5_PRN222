@@ -45,14 +45,24 @@ namespace PROJECT_BOOK_STORE_GROUP5_PRN222.Migrations
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+
                     category_code = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+
                     category_name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    created_at = table.Column<DateTime>(type: "datetime2", nullable: true, defaultValueSql: "(getdate())")
+
+                    parent_id = table.Column<long>(type: "bigint", nullable: true),
+
+                    is_deleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+
+                    created_at = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "(getdate())"),
+
+                    updated_at = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK__categori__3213E83F3D6EB9C1", x => x.id);
+                    table.PrimaryKey("PK_categories", x => x.id);
                 });
+
 
             migrationBuilder.CreateTable(
                 name: "users",

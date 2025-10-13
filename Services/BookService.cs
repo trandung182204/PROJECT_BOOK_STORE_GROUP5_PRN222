@@ -52,7 +52,7 @@ namespace PROJECT_BOOK_STORE_GROUP5_PRN222.Services
             if (books == null || !books.Any())
                 throw new InvalidOperationException("No books available.");
 
-            return books;
+            return (IEnumerable<Book>)books;
         }
 
         public async Task<Book?> GetBookByIdAsync(long id)
