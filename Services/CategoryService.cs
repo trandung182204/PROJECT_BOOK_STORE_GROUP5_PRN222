@@ -106,5 +106,11 @@ namespace PROJECT_BOOK_STORE_GROUP5_PRN222.Services
 
             await _baseRepository.UpdateAsync(category);
         }
+
+        public async Task<bool> ExistsAsync(string code, string name)
+        {
+            return await _context.Categories
+                .AnyAsync(c => c.CategoryCode == code || c.CategoryName == name);
+        }
     }
 }

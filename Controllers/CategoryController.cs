@@ -40,13 +40,15 @@ namespace PROJECT_BOOK_STORE_GROUP5_PRN222.Controllers
                 return BadRequest("CategoryCode is required.");
             if (string.IsNullOrWhiteSpace(category.CategoryName))
                 return BadRequest("CategoryName is required.");
+            if (await categoryService.ExistsAsync(category.CategoryCode, category.CategoryName))
+                return BadRequest("CategoryCode or CategoryName already exists.");
 
             category.IsDeleted = false;
             category.CreatedAt = DateTime.Now;
             category.UpdatedAt = null;
 
             await categoryService.AddCategoryAsync(category);
-            return Ok(category);
+            return Ok(new { message = "Category created successfully.", category });
         }
 
         [HttpPut("{id}")]
@@ -54,9 +56,11 @@ namespace PROJECT_BOOK_STORE_GROUP5_PRN222.Controllers
         {
             if (id != category.Id)
                 return BadRequest("ID mismatch.");
+            if (await categoryService.ExistsAsync(category.CategoryCode, category.CategoryName))
+                return BadRequest("CategoryCode or CategoryName already exists.");
 
             await categoryService.UpdateCategoryAsync(category);
-            return NoContent();
+            return Ok(new { message = "Category updated successfully.", category });
         }
 
         [HttpDelete("{id}")]

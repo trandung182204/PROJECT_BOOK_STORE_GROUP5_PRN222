@@ -9,6 +9,6 @@ namespace PROJECT_BOOK_STORE_GROUP5_PRN222.Services
         Task AddCategoryAsync(Category category);
         Task UpdateCategoryAsync(Category category);
         Task DeleteCategoryAsync(long id);
-
+        Task<bool> ExistsAsync(string code, string name);
     }
 }
