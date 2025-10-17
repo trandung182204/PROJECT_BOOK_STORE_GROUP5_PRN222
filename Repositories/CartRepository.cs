@@ -15,8 +15,7 @@ namespace PROJECT_BOOK_STORE_GROUP5_PRN222.Repositories
 
         public async Task<Cart?> GetCartByUserIdAsync(string userId)
         {
-            return await  _bookStoreContext.Carts.Include(c => c.CartItems)
-                          .FirstOrDefaultAsync(x => x.Id.Equals(userId));
+            return await  _bookStoreContext.Carts.FirstOrDefaultAsync(c => c.UserId.Equals(userId));
         }
     }
 }

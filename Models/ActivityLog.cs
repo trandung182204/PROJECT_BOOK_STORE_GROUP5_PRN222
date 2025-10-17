@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using PROJECT_BOOK_STORE_GROUP5_PRN222.Data;
+
 namespace PROJECT_BOOK_STORE_GROUP5_PRN222.Models;
 
 public partial class ActivityLog
@@ -15,5 +15,5 @@ public partial class ActivityLog
 
     public DateTime? CreatedAt { get; set; }
 
-    public virtual ApplicationUser User { get; set; }
+    public virtual AspNetUser? User { get; set; }
 }

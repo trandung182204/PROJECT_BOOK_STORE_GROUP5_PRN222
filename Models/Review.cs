@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using PROJECT_BOOK_STORE_GROUP5_PRN222.Data;
 
 namespace PROJECT_BOOK_STORE_GROUP5_PRN222.Models;
 
@@ -22,5 +21,5 @@ public partial class Review
 
     public virtual Book Book { get; set; } = null!;
 
-    public virtual ApplicationUser User { get; set; }
+    public virtual AspNetUser? User { get; set; }
 }

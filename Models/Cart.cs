@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using PROJECT_BOOK_STORE_GROUP5_PRN222.Data;
 
 namespace PROJECT_BOOK_STORE_GROUP5_PRN222.Models;
 
@@ -16,5 +15,5 @@ public partial class Cart
 
     public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
 
-    public virtual ApplicationUser User { get; set; }
+    public virtual AspNetUser? User { get; set; }
 }

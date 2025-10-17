@@ -15,6 +15,8 @@ public partial class CartItem
 
     public DateTime? CreatedAt { get; set; }
 
+    public decimal? UnitPrice { get; set; }
+
     public virtual Book Book { get; set; } = null!;
 
     public virtual Cart Cart { get; set; } = null!;
