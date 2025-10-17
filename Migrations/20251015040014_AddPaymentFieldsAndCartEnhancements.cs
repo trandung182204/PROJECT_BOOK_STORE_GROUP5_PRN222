@@ -9,63 +9,96 @@ namespace PROJECT_BOOK_STORE_GROUP5_PRN222.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            // 🛒 CART ITEMS: thêm UnitPrice
-            migrationBuilder.AddColumn<decimal>(
-                name: "UnitPrice",
-                table: "cart_items", // 👈 sửa tên bảng cho đúng với SQL Server
-                type: "decimal(10,2)",
-                nullable: true);
+            // Thêm UnitPrice vào cart_items nếu chưa có
+            migrationBuilder.Sql(@"
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE Name = 'UnitPrice' AND Object_ID = Object_ID('dbo.cart_items'))
+BEGIN
+    ALTER TABLE [dbo].[cart_items] ADD [UnitPrice] DECIMAL(10,2) NULL;
+END
+");
 
-            // 🧾 ORDERS: thêm các cột thanh toán và địa chỉ giao hàng
-            migrationBuilder.AddColumn<string>(
-                name: "PaymentMethod",
-                table: "Orders",
-                type: "nvarchar(20)",
-                nullable: true);
+            // Thêm TransactionId nếu chưa có (snake_case trong DB là transaction_id; kiểm tra cả 2 dạng)
+            migrationBuilder.Sql(@"
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE Name = 'transaction_id' AND Object_ID = Object_ID('dbo.orders'))
+AND NOT EXISTS (SELECT 1 FROM sys.columns WHERE Name = 'TransactionId' AND Object_ID = Object_ID('dbo.orders'))
+BEGIN
+    ALTER TABLE [dbo].[orders] ADD [transaction_id] NVARCHAR(100) NULL;
+END
+");
 
-            migrationBuilder.AddColumn<string>(
-                name: "PaymentStatus",
-                table: "Orders",
-                type: "nvarchar(20)",
-                nullable: true,
-                defaultValue: "PENDING");
+            // Thêm payment_date nếu chưa có
+            migrationBuilder.Sql(@"
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE Name = 'payment_date' AND Object_ID = Object_ID('dbo.orders'))
+AND NOT EXISTS (SELECT 1 FROM sys.columns WHERE Name = 'PaymentDate' AND Object_ID = Object_ID('dbo.orders'))
+BEGIN
+    ALTER TABLE [dbo].[orders] ADD [payment_date] DATETIME2 NULL;
+END
+");
 
-            migrationBuilder.AddColumn<string>(
-                name: "TransactionId",
-                table: "Orders",
-                type: "nvarchar(100)",
-                nullable: true);
+            // Thêm note nếu chưa có
+            migrationBuilder.Sql(@"
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE Name = 'note' AND Object_ID = Object_ID('dbo.orders'))
+AND NOT EXISTS (SELECT 1 FROM sys.columns WHERE Name = 'Note' AND Object_ID = Object_ID('dbo.orders'))
+BEGIN
+    ALTER TABLE [dbo].[orders] ADD [note] NVARCHAR(255) NULL;
+END
+");
 
-            migrationBuilder.AddColumn<DateTime>(
-                name: "PaymentDate",
-                table: "Orders",
-                type: "datetime2",
-                nullable: true);
+            // Nếu bạn muốn thêm shipping_address (nhiều DB của bạn đã có), chỉ thêm khi thiếu
+            migrationBuilder.Sql(@"
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE Name = 'shipping_address' AND Object_ID = Object_ID('dbo.orders'))
+AND NOT EXISTS (SELECT 1 FROM sys.columns WHERE Name = 'ShippingAddress' AND Object_ID = Object_ID('dbo.orders'))
+BEGIN
+    ALTER TABLE [dbo].[orders] ADD [shipping_address] NVARCHAR(MAX) NULL;
+END
+");
 
-            migrationBuilder.AddColumn<string>(
-                name: "ShippingAddress",
-                table: "Orders",
-                type: "nvarchar(255)",
-                nullable: true);
-
-            migrationBuilder.AddColumn<string>(
-                name: "Note",
-                table: "Orders",
-                type: "nvarchar(255)",
-                nullable: true);
+            // Nếu muốn thêm payment_status default, nhưng DB có thể đã có payment_status.
+            migrationBuilder.Sql(@"
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE Name = 'payment_status' AND Object_ID = Object_ID('dbo.orders'))
+BEGIN
+    ALTER TABLE [dbo].[orders] ADD [payment_status] NVARCHAR(20) NULL CONSTRAINT DF_orders_payment_status DEFAULT 'PENDING';
+END
+");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            // Rollback nếu cần
-            migrationBuilder.DropColumn(name: "UnitPrice", table: "cart_items"); // 👈 sửa ở đây luôn
+            // Rollback: xóa các cột chỉ khi tồn tại
+            migrationBuilder.Sql(@"
+IF EXISTS (SELECT 1 FROM sys.columns WHERE Name = 'UnitPrice' AND Object_ID = Object_ID('dbo.cart_items'))
+BEGIN
+    ALTER TABLE [dbo].[cart_items] DROP COLUMN [UnitPrice];
+END
+");
 
-            migrationBuilder.DropColumn(name: "PaymentMethod", table: "Orders");
-            migrationBuilder.DropColumn(name: "PaymentStatus", table: "Orders");
-            migrationBuilder.DropColumn(name: "TransactionId", table: "Orders");
-            migrationBuilder.DropColumn(name: "PaymentDate", table: "Orders");
-            migrationBuilder.DropColumn(name: "ShippingAddress", table: "Orders");
-            migrationBuilder.DropColumn(name: "Note", table: "Orders");
+            migrationBuilder.Sql(@"
+IF EXISTS (SELECT 1 FROM sys.columns WHERE Name = 'transaction_id' AND Object_ID = Object_ID('dbo.orders'))
+BEGIN
+    ALTER TABLE [dbo].[orders] DROP COLUMN [transaction_id];
+END
+");
+
+            migrationBuilder.Sql(@"
+IF EXISTS (SELECT 1 FROM sys.columns WHERE Name = 'payment_date' AND Object_ID = Object_ID('dbo.orders'))
+BEGIN
+    ALTER TABLE [dbo].[orders] DROP COLUMN [payment_date];
+END
+");
+
+            migrationBuilder.Sql(@"
+IF EXISTS (SELECT 1 FROM sys.columns WHERE Name = 'note' AND Object_ID = Object_ID('dbo.orders'))
+BEGIN
+    ALTER TABLE [dbo].[orders] DROP COLUMN [note];
+END
+");
+
+            migrationBuilder.Sql(@"
+IF EXISTS (SELECT 1 FROM sys.columns WHERE Name = 'shipping_address' AND Object_ID = Object_ID('dbo.orders'))
+BEGIN
+    ALTER TABLE [dbo].[orders] DROP COLUMN [shipping_address];
+END
+");
         }
     }
 }
